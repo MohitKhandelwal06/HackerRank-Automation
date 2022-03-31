@@ -37,10 +37,34 @@ browserOpenPromise.then(function(browser){
         ".ui-btn.ui-btn-large.ui-btn-primary.auth-button.ui-btn-styled"
       );
       return willBeLoggedInPromise;
-    })
-    .then(function () {
+})
+.then(function () {
       console.log("logged into hackerrank successfully");
-    })
-    .catch(function (err) {
+      let algorithmTabWillBeOpened=waitAndClick("div[data-automation='algorithms']");
+      return algorithmTabWillBeOpened;
+})
+.then(function(){
+    console.log("algorithm page is opened");
+})
+.catch(function (err) {
       console.log(err);
+});
+
+function waitAndClick(algobtn){
+    let myPromise=new Promise(function(resolve,reject){
+        let waitForSelectorPromise=ctab.waitForSelector(algobtn);
+        waitForSelectorPromise
+        .then(function(){
+            console.log("algo btn found");
+            let clickPromise=ctab.click(algobtn);
+            return clickPromise;
+        })
+        .then(function(){
+            console.log("algo btn is clicked");
+            resolve();
+        })
+        .catch(function (err){
+            console.log(err);
+        })
     });
+};
