@@ -45,13 +45,35 @@ browserOpenPromise.then(function(browser){
 })
 .then(function(){
     console.log("algorithm page is opened");
+    let allQuesPromise=ctab.waitForSelector('a[data-analytics="ChallengeListChallengeName"]');
+    return allQuesPromise;
+})
+.then(function(){
+    function getAllQuesLinks(){
+        let allElemArr=document.querySelectorAll('a[data-analytics="ChallengeListChallengeName"]');
+        let linksArr=[];
+        for(let i=0;i<allElemArr.length;i++){
+            linksArr.push(allElemArr[i].getAttribute('href'));
+        }
+        return linksArr;
+    }
+    console.log("Here");
+    let linksArrPromise=ctab.evaluate(getAllQuesLinks);
+    return linksArrPromise;
+})
+.then(function(linksArr){
+    console.log(linksArr);
+    for(let i=0;i<linksArr.length;i++){
+        console.log(ctab.url()+linksArr[i]);
+    }
+    
 })
 .catch(function (err) {
       console.log(err);
 });
 
 function waitAndClick(algobtn){
-    let myPromise=new Promise(function(resolve,reject){
+    let waitAndClickPromise=new Promise(function(resolve,reject){
         let waitForSelectorPromise=ctab.waitForSelector(algobtn);
         waitForSelectorPromise
         .then(function(){
@@ -67,4 +89,5 @@ function waitAndClick(algobtn){
             console.log(err);
         })
     });
+    return waitAndClickPromise;
 };
