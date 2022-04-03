@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const{email,password}=require("./credentials");
-
+const{answer}=require("./codes");
 let ctab;
 
 
@@ -63,8 +63,12 @@ browserOpenPromise.then(function(browser){
 })
 .then(function(linksArr){
     console.log(linksArr);
+    let baseLink="https://www.hackerrank.com";
+    
     for(let i=0;i<linksArr.length;i++){
-        console.log(ctab.url()+linksArr[i]);
+        let questionWillBeSolvedPromise=questionSolver(baseLink+linksArr[i],i);
+        // ctab.goto(baseLink+linksArr[i]);
+        break;
     }
     
 })
@@ -77,12 +81,12 @@ function waitAndClick(algobtn){
         let waitForSelectorPromise=ctab.waitForSelector(algobtn);
         waitForSelectorPromise
         .then(function(){
-            console.log("algo btn found");
+            console.log("btn found");
             let clickPromise=ctab.click(algobtn);
             return clickPromise;
         })
         .then(function(){
-            console.log("algo btn is clicked");
+            console.log("btn is clicked");
             resolve();
         })
         .catch(function (err){
@@ -91,3 +95,59 @@ function waitAndClick(algobtn){
     });
     return waitAndClickPromise;
 };
+
+
+function questionSolver(link,idx){
+return new Promise(function(resolve,reject){
+    let gotoQuestionPagePromise=ctab.goto(link);
+    gotoQuestionPagePromise.then(function(){
+        console.log("Question Page Opened");
+        let waitForCheckBoxAndClickPromise=waitAndClick(".checkbox-input");
+        return waitForCheckBoxAndClickPromise;
+    })
+    .then(function(){
+        let waitForTextBoxPromise=ctab.waitForSelector(".custominput");
+        return waitForTextBoxPromise;
+    })
+    .then(function(){
+        let codeWillBeTypedPromise=ctab.type(".custominput",answer[idx]);
+        return codeWillBeTypedPromise;
+    })
+    .then(function(){
+        let controlClickedPromise=ctab.keyboard.down("Control");
+        return controlClickedPromise;
+    })
+    .then(function(){
+        let aKeyClickedPromise=ctab.keyboard.press("a");
+        return aKeyClickedPromise;
+    })
+    .then(function(){
+        let xKeyClickedPromise=ctab.keyboard.press("x");
+        return xKeyClickedPromise;
+    })
+    .then(function(){
+        let cursorOnEditorPromise=ctab.click(".monaco-editor.no-user-select.vs");
+        return cursorOnEditorPromise;
+    })
+    .then(function(){
+        let aKeyClickedPromise=ctab.keyboard.press("a");
+        return aKeyClickedPromise;
+    })
+    .then(function(){
+        let vKeyClickedPromise=ctab.keyboard.press("v");
+        return vKeyClickedPromise;
+    })
+    .then(function(){
+        let controlDownPromise=ctab.keyboard.down("Control");
+        return controlDownPromise;
+    })
+    .then(function(){
+        console.log("COde Submitted Successfully");
+        ctab.click(".hr-monaco-submit");
+        resolve;
+    })
+    .catch(function(err){
+        reject(err);
+    })
+})
+}
